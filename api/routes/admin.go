@@ -7,4 +7,7 @@ import (
 
 func AdminRoutes(r chi.Router) {
 	r.Post("/add", handlers.AdminCreate)
+	r.Put("/update", handlers.AdminUpdate)
+	r.Delete("/delete/{id}", handlers.AdminDelete)
+	r.Get("/list", handlers.AdminList)
 }

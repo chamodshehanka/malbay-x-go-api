@@ -13,8 +13,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = http.ListenAndServe(":4000", routes)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Println(http.ListenAndServe(":4000", routes))
 }
