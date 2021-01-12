@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"../handlers"
+	"github.com/Shehanka/malbay-x-go-api/api/handlers"
 	"github.com/go-chi/chi"
 )
 

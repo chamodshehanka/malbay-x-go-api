@@ -1,9 +1,10 @@
 package main
 
 import (
-	"./api"
 	"log"
 	"net/http"
+
+	"github.com/Shehanka/malbay-x-go-api/api"
 )
 
 func main() {

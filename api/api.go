@@ -1,7 +1,7 @@
 package api
 
 import (
-	"./routes"
+	"github.com/Shehanka/malbay-x-go-api/api/routes"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -9,7 +9,7 @@ import (
 
 var r *chi.Mux
 
-func LoadAPI()(*chi.Mux, error)  {
+func LoadAPI() (*chi.Mux, error) {
 	r = chi.NewRouter()
 
 	cors := cors.New(cors.Options{
