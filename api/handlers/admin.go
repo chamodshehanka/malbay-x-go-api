@@ -17,3 +17,7 @@ func AdminDelete(w http.ResponseWriter, r *http.Request) {
 func AdminList(w http.ResponseWriter, r *http.Request) {
 
 }
+
+func AdminGetByID(w http.ResponseWriter, r *http.Request) {
+
+}

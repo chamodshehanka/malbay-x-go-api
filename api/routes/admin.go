@@ -10,4 +10,5 @@ func AdminRoutes(r chi.Router) {
 	r.Put("/update", handlers.AdminUpdate)
 	r.Delete("/delete/{id}", handlers.AdminDelete)
 	r.Get("/list", handlers.AdminList)
+	r.Get("/get/{id}", handlers.AdminGetByID)
 }
