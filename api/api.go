@@ -27,6 +27,7 @@ func LoadAPI() (*chi.Mux, error) {
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Route("/admin", routes.AdminRoutes)
+		r.Route("/product", routes.ProductRoutes)
 	})
 
 	return r, nil

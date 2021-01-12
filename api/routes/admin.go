@@ -6,5 +6,5 @@ import (
 )
 
 func AdminRoutes(r chi.Router) {
-	r.Post("/add", handlers.AppCreate)
+	r.Post("/add", handlers.AdminCreate)
 }
