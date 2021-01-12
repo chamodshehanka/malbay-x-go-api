@@ -26,6 +26,8 @@ func ProductDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProductList(w http.ResponseWriter, r *http.Request) {
+	loadProducts()
+
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(products)
 }
