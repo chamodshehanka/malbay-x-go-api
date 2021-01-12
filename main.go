@@ -19,7 +19,7 @@ func main() {
 	testDB := client.Database("ShopDB")
 	podcastsCollection := testDB.Collection("admins")
 
-	cursor,err := podcastsCollection.Find(ctx, bson.M{})
+	cursor, err := podcastsCollection.Find(ctx, bson.M{})
 	if err != nil {
 		log.Fatalf("%s", err)
 	}

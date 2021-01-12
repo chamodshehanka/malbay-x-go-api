@@ -4,4 +4,4 @@ server:
 database:
   dbname: "ShopDB"
   user: "chamod"
-  password: "12345"
+  password: "afmongodb"

@@ -12,7 +12,7 @@ var r *chi.Mux
 func LoadAPI() (*chi.Mux, error) {
 	r = chi.NewRouter()
 
-	cors := cors.New(cors.Options{
+	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
@@ -21,7 +21,7 @@ func LoadAPI() (*chi.Mux, error) {
 		MaxAge:           300,
 	})
 
-	r.Use(cors.Handler)
+	r.Use(c.Handler)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 
