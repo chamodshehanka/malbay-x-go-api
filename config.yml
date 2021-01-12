@@ -2,6 +2,6 @@ server:
   port: 4000
 
 database:
-  dbname: "ShopDB"
+  dbname: "MalbayX"
   user: "chamod"
   password: "afmongodb"

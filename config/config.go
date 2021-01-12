@@ -29,8 +29,9 @@ func GetMongoDBConnection() *mongo.Client {
 
 	user := viper.GetString("database.user")
 	password := viper.GetString("database.password")
+	database := viper.GetString("database.name")
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://" + user + ":" + password + "@afcluster-mig7i.gcp.mongodb.net/ShopDB?retryWrites=true&w=majority"))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://" + user + ":" + password + "@afcluster-mig7i.gcp.mongodb.net/" + database + "?retryWrites=true&w=majority"))
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
