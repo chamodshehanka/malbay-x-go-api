@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var collection = db.GetProductCollection()
+var productCollection = db.GetProductCollection()
 
 func ProductCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -22,7 +22,7 @@ func ProductCreate(w http.ResponseWriter, r *http.Request) {
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	result, _ := collection.InsertOne(ctx, product)
+	result, _ := productCollection.InsertOne(ctx, product)
 
 	_ = json.NewEncoder(w).Encode(result)
 }
@@ -41,7 +41,7 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	cursor, err := collection.Find(ctx, bson.M{})
+	cursor, err := productCollection.Find(ctx, bson.M{})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
@@ -75,7 +75,7 @@ func ProductGetByID(w http.ResponseWriter, r *http.Request) {
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	err := collection.FindOne(ctx, models.Product{ID: id}).Decode(&p)
+	err := productCollection.FindOne(ctx, models.Product{ID: id}).Decode(&p)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
