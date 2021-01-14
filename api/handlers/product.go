@@ -61,7 +61,6 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = json.NewEncoder(w).Encode(products)
-
 }
 
 func ProductGetByID(w http.ResponseWriter, r *http.Request) {
@@ -78,5 +77,6 @@ func ProductGetByID(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
 	_ = json.NewEncoder(w).Encode(p)
 }
