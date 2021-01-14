@@ -55,7 +55,7 @@ func AdminDelete(w http.ResponseWriter, r *http.Request) {
 	RespondwithJSON(w, 200, result)
 }
 
-func AdminList(w http.ResponseWriter, r *http.Request) {
+func AdminList(w http.ResponseWriter, _ *http.Request) {
 	var admins []models.Admin
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
