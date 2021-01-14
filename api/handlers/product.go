@@ -15,8 +15,6 @@ import (
 var productCollection = db.GetProductCollection()
 
 func ProductCreate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var product models.Product
 	_ = json.NewDecoder(r.Body).Decode(&product)
 
@@ -24,7 +22,7 @@ func ProductCreate(w http.ResponseWriter, r *http.Request) {
 
 	result, _ := productCollection.InsertOne(ctx, product)
 
-	_ = json.NewEncoder(w).Encode(result)
+	RespondwithJSON(w, 200, result)
 }
 
 func ProductUpdate(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +34,6 @@ func ProductDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProductList(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	var products []models.Product
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -60,12 +57,10 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(products)
+	RespondwithJSON(w, 200, products)
 }
 
 func ProductGetByID(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	id, _ := primitive.ObjectIDFromHex(chi.URLParam(r, "id"))
 
 	var p models.Product
@@ -78,5 +73,5 @@ func ProductGetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(p)
+	RespondwithJSON(w, 200, p)
 }
