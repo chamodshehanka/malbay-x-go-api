@@ -2,8 +2,6 @@ package config
 
 import (
 	"context"
-	"fmt"
-	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -12,24 +10,10 @@ import (
 )
 
 func GetMongoDBConnection() *mongo.Client {
-	// Set the file name of the configurations file
-	viper.SetConfigName("config")
 
-	// Set the path to look for the configurations file
-	viper.AddConfigPath(".")
-
-	// Enable VIPER to read Environment Variables
-	viper.AutomaticEnv()
-
-	viper.SetConfigType("yaml")
-
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading config file, %s", err)
-	}
-
-	user := viper.GetString("database.user")
-	password := viper.GetString("database.password")
-	database := viper.GetString("database.name")
+	user := GetEnv("database.user")
+	password := GetEnv("database.password")
+	database := GetEnv("database.name")
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://" + user + ":" + password + "@afcluster-mig7i.gcp.mongodb.net/" + database + "?retryWrites=true&w=majority"))
 	if err != nil {

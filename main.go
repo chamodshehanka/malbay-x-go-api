@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/Shehanka/malbay-x-go-api/api"
+	"github.com/Shehanka/malbay-x-go-api/config"
+	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 )
@@ -9,9 +11,17 @@ import (
 func main() {
 
 	routes, err := api.LoadAPI()
+
 	if err != nil {
+
 		log.Fatal(err)
+
 	}
 
-	log.Println(http.ListenAndServe(":4000", routes))
+	port := config.GetEnv("server.port")
+
+	logrus.Info("Malbay server listening on ", port)
+
+	log.Println(http.ListenAndServe(":"+port, routes))
+
 }
