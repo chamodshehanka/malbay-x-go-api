@@ -20,7 +20,7 @@ func main() {
 
 	port := config.GetEnv("server.port")
 
-	logrus.Info("Malbay started listening on ", port)
+	logrus.Info("Malbay server listening on ", port)
 
 	log.Println(http.ListenAndServe(":"+port, routes))
 
