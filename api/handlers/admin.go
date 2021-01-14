@@ -22,7 +22,7 @@ func AdminCreate(w http.ResponseWriter, r *http.Request) {
 
 	result, _ := adminCollection.InsertOne(ctx, admin)
 
-	RespondwithJSON(w, 200, result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
 func AdminUpdate(w http.ResponseWriter, r *http.Request) {
@@ -33,12 +33,12 @@ func AdminUpdate(w http.ResponseWriter, r *http.Request) {
 
 	result, err := adminCollection.UpdateOne(ctx, models.Admin{ID: admin.ID}, admin)
 	if err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	RespondwithJSON(w, 200, result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
 func AdminDelete(w http.ResponseWriter, r *http.Request) {
@@ -47,12 +47,12 @@ func AdminDelete(w http.ResponseWriter, r *http.Request) {
 
 	result, err := adminCollection.DeleteOne(ctx, models.Admin{ID: id})
 	if err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	RespondwithJSON(w, 200, result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
 func AdminList(w http.ResponseWriter, _ *http.Request) {
@@ -62,7 +62,7 @@ func AdminList(w http.ResponseWriter, _ *http.Request) {
 
 	cursor, err := productCollection.Find(ctx, bson.M{})
 	if err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
@@ -75,12 +75,12 @@ func AdminList(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	RespondwithJSON(w, 200, admins)
+	ResponseWithJSON(w, http.StatusOK, admins)
 }
 
 func AdminGetByID(w http.ResponseWriter, r *http.Request) {
@@ -92,10 +92,10 @@ func AdminGetByID(w http.ResponseWriter, r *http.Request) {
 
 	err := adminCollection.FindOne(ctx, models.Admin{ID: id}).Decode(&a)
 	if err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	RespondwithJSON(w, 200, a)
+	ResponseWithJSON(w, http.StatusOK, a)
 }

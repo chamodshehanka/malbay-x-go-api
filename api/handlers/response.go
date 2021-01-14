@@ -8,12 +8,12 @@ import (
 // RespondWithError return error message
 func RespondWithError(w http.ResponseWriter, code int, msg interface{}) {
 
-	RespondwithJSON(w, code, map[string]interface{}{"message": msg})
+	ResponseWithJSON(w, code, map[string]interface{}{"message": msg})
 
 }
 
-// RespondwithJSON write json response format
-func RespondwithJSON(w http.ResponseWriter, code int, payload interface{}) {
+// ResponseWithJSON write json response format
+func ResponseWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 	t := "data"
 
@@ -29,5 +29,5 @@ func RespondwithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(response)
+	_, _ = w.Write(response)
 }

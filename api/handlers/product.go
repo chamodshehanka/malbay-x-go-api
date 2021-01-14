@@ -22,7 +22,7 @@ func ProductCreate(w http.ResponseWriter, r *http.Request) {
 
 	result, _ := productCollection.InsertOne(ctx, product)
 
-	RespondwithJSON(w, 200, result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
 func ProductUpdate(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +40,7 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 
 	cursor, err := productCollection.Find(ctx, bson.M{})
 	if err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
@@ -52,12 +52,12 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	RespondwithJSON(w, 200, products)
+	ResponseWithJSON(w, http.StatusOK, products)
 }
 
 func ProductGetByID(w http.ResponseWriter, r *http.Request) {
@@ -68,10 +68,10 @@ func ProductGetByID(w http.ResponseWriter, r *http.Request) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	if err := productCollection.FindOne(ctx, models.Product{ID: id}).Decode(&p); err != nil {
-		RespondWithError(w, 404, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	RespondwithJSON(w, 200, p)
+	ResponseWithJSON(w, http.StatusOK, p)
 }
