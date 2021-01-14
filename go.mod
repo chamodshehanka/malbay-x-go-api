@@ -16,6 +16,7 @@ require (
 	github.com/go-chi/cors v1.1.1
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.1
 	go.mongodb.org/mongo-driver v1.4.4
 	golang.org/x/sys v0.0.0-20210113181707-4bcb84eeeb78 // indirect
