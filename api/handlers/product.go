@@ -43,8 +43,7 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 
 	cursor, err := productCollection.Find(ctx, bson.M{})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, 404, err.Error())
 
 		return
 	}
@@ -56,8 +55,7 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, 404, err.Error())
 
 		return
 	}
@@ -75,10 +73,8 @@ func ProductGetByID(w http.ResponseWriter, r *http.Request) {
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	err := productCollection.FindOne(ctx, models.Product{ID: id}).Decode(&p)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+	if err := productCollection.FindOne(ctx, models.Product{ID: id}).Decode(&p); err != nil {
+		RespondWithError(w, 404, err.Error())
 
 		return
 	}
