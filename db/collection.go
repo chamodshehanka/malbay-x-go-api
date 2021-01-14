@@ -14,3 +14,7 @@ func getDB() *mongo.Database {
 func GetProductCollection() *mongo.Collection {
 	return getDB().Collection("products")
 }
+
+func GetAdminCollection() *mongo.Collection {
+	return getDB().Collection("admins")
+}
