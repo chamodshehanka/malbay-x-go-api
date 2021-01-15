@@ -15,8 +15,6 @@ import (
 var productCollection = db.GetProductCollection()
 
 func ProductCreate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var product models.Product
 	_ = json.NewDecoder(r.Body).Decode(&product)
 
@@ -24,7 +22,7 @@ func ProductCreate(w http.ResponseWriter, r *http.Request) {
 
 	result, _ := productCollection.InsertOne(ctx, product)
 
-	_ = json.NewEncoder(w).Encode(result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
 func ProductUpdate(w http.ResponseWriter, r *http.Request) {
@@ -36,15 +34,13 @@ func ProductDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProductList(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	var products []models.Product
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	cursor, err := productCollection.Find(ctx, bson.M{})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
@@ -56,31 +52,26 @@ func ProductList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(products)
-
+	ResponseWithJSON(w, http.StatusOK, products)
 }
 
 func ProductGetByID(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	id, _ := primitive.ObjectIDFromHex(chi.URLParam(r, "id"))
 
 	var p models.Product
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	err := productCollection.FindOne(ctx, models.Product{ID: id}).Decode(&p)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+	if err := productCollection.FindOne(ctx, models.Product{ID: id}).Decode(&p); err != nil {
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
-	_ = json.NewEncoder(w).Encode(p)
+
+	ResponseWithJSON(w, http.StatusOK, p)
 }

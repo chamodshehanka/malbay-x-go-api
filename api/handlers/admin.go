@@ -15,8 +15,6 @@ import (
 var adminCollection = db.GetAdminCollection()
 
 func AdminCreate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var admin models.Admin
 	_ = json.NewDecoder(r.Body).Decode(&admin)
 
@@ -24,12 +22,10 @@ func AdminCreate(w http.ResponseWriter, r *http.Request) {
 
 	result, _ := adminCollection.InsertOne(ctx, admin)
 
-	_ = json.NewEncoder(w).Encode(result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
 func AdminUpdate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var admin models.Admin
 	_ = json.NewDecoder(r.Body).Decode(&admin)
 
@@ -37,43 +33,36 @@ func AdminUpdate(w http.ResponseWriter, r *http.Request) {
 
 	result, err := adminCollection.UpdateOne(ctx, models.Admin{ID: admin.ID}, admin)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
 func AdminDelete(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	id, _ := primitive.ObjectIDFromHex(chi.URLParam(r, "id"))
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	result, err := adminCollection.DeleteOne(ctx, models.Admin{ID: id})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(result)
+	ResponseWithJSON(w, http.StatusOK, result)
 }
 
-func AdminList(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
+func AdminList(w http.ResponseWriter, _ *http.Request) {
 	var admins []models.Admin
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	cursor, err := productCollection.Find(ctx, bson.M{})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
@@ -86,18 +75,15 @@ func AdminList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := cursor.Err(); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(admins)
+	ResponseWithJSON(w, http.StatusOK, admins)
 }
 
 func AdminGetByID(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	id, _ := primitive.ObjectIDFromHex(chi.URLParam(r, "id"))
 
 	var a models.Admin
@@ -106,10 +92,10 @@ func AdminGetByID(w http.ResponseWriter, r *http.Request) {
 
 	err := adminCollection.FindOne(ctx, models.Admin{ID: id}).Decode(&a)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
 	}
-	_ = json.NewEncoder(w).Encode(a)
+
+	ResponseWithJSON(w, http.StatusOK, a)
 }
