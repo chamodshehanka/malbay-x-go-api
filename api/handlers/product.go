@@ -67,7 +67,9 @@ func ProductGetByID(w http.ResponseWriter, r *http.Request) {
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	if err := productCollection.FindOne(ctx, models.Product{ID: id}).Decode(&p); err != nil {
+	f := bson.D{{"_id", id}}
+
+	if err := productCollection.FindOne(ctx, f).Decode(&p); err != nil {
 		RespondWithError(w, http.StatusInternalServerError, err.Error())
 
 		return
