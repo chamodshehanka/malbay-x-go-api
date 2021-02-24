@@ -25,7 +25,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func Singup(w http.ResponseWriter, r *http.Request) {
+func Signup(w http.ResponseWriter, r *http.Request) {
 	var creds Credentials
 	_ = json.NewDecoder(r.Body).Decode(&creds)
 

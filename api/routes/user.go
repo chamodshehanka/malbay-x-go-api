@@ -6,8 +6,8 @@ import (
 )
 
 func UserRouter(r chi.Router) {
-	r.Post("/refresh", handlers.Refresh)
-	r.Post("/singin", handlers.Signin)
-	r.Post("/singup", handlers.Singup)
+	r.Post("/signin", handlers.Signin)
+	r.Post("/signup", handlers.Signup)
 	r.Get("/welcome", handlers.Welcome)
+	r.Post("/refresh", handlers.Refresh)
 }
