@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Shehanka/malbay-x-go-api/db"
+	"github.com/Shehanka/malbay-x-go-api/models"
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
@@ -14,19 +15,8 @@ import (
 var userCollection = db.GetUserCollection()
 var jwtKey = []byte("my_secret_key")
 
-type Credentials struct {
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-}
-
-type Claims struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
-}
-
 func Signup(w http.ResponseWriter, r *http.Request) {
-	var creds Credentials
+	var creds models.UserDetail
 
 	_ = json.NewDecoder(r.Body).Decode(&creds)
 
@@ -38,7 +28,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func Signin(w http.ResponseWriter, r *http.Request) {
-	var creds, userCreds Credentials
+	var creds, userCreds models.Credentials
 
 	_ = json.NewDecoder(r.Body).Decode(&creds)
 
@@ -55,7 +45,7 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Password :: ", userCreds.Password)
 
 	expirationTime := time.Now().Add(5 * time.Minute)
-	claims := &Claims{
+	claims := &models.Claims{
 		Username: creds.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
@@ -94,7 +84,7 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tknStr := c.Value
-	claims := &Claims{}
+	claims := &models.Claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
@@ -137,7 +127,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tknStr := c.Value
-	claims := &Claims{}
+	claims := &models.Claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
