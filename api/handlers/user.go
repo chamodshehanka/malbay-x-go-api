@@ -40,13 +40,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 func Signin(w http.ResponseWriter, r *http.Request) {
 	var creds, userCreds Credentials
 
-	err := json.NewDecoder(r.Body).Decode(&creds)
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
+	_ = json.NewDecoder(r.Body).Decode(&creds)
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
@@ -72,7 +66,8 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
@@ -88,10 +83,13 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
+			RespondWithError(w, http.StatusUnauthorized, err.Error())
+
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
+
+		RespondWithError(w, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
@@ -104,19 +102,23 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			w.WriteHeader(http.StatusUnauthorized)
+			RespondWithError(w, http.StatusUnauthorized, err.Error())
+
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
+
+		RespondWithError(w, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
 	if !tkn.Valid {
-		w.WriteHeader(http.StatusUnauthorized)
+		RespondWithError(w, http.StatusUnauthorized, "Token is invalid")
+
 		return
 	}
 
-	w.Write([]byte(fmt.Sprintf("Welcome %s!", claims.Username)))
+	ResponseWithJSON(w, http.StatusOK, "Welcome to malbay-x")
 }
 
 func Refresh(w http.ResponseWriter, r *http.Request) {
@@ -124,10 +126,13 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
+			RespondWithError(w, http.StatusUnauthorized, err.Error())
+
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
+
+		RespondWithError(w, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
@@ -139,21 +144,26 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if !tkn.Valid {
-		w.WriteHeader(http.StatusUnauthorized)
+		RespondWithError(w, http.StatusUnauthorized, "Token is invalid")
+
 		return
 	}
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			w.WriteHeader(http.StatusUnauthorized)
+			RespondWithError(w, http.StatusUnauthorized, err.Error())
+
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
+
+		RespondWithError(w, http.StatusBadRequest, err.Error())
+
 		return
 	}
-
+	//TODO: Increase the time more than 30s
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
-		w.WriteHeader(http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Token is not expired yet")
+
 		return
 	}
 
@@ -163,7 +173,8 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
+
 		return
 	}
 
