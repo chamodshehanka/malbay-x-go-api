@@ -9,6 +9,7 @@ replace github.com/Shehanka/malbay-x-go-api/api/routes => ./api/routes
 replace github.com/Shehanka/malbay-x-go-api/api/handlers => ./api/handlers
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-chi/chi v1.5.1
 	github.com/go-chi/cors v1.1.1
