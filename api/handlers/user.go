@@ -27,6 +27,7 @@ type Claims struct {
 
 func Signup(w http.ResponseWriter, r *http.Request) {
 	var creds Credentials
+
 	_ = json.NewDecoder(r.Body).Decode(&creds)
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -37,12 +38,13 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func Signin(w http.ResponseWriter, r *http.Request) {
-	var creds Credentials
-	var userCreds Credentials
+	var creds, userCreds Credentials
 
 	err := json.NewDecoder(r.Body).Decode(&creds)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+
 		return
 	}
 
@@ -55,10 +57,10 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
 	fmt.Println("Password :: ", userCreds.Password)
 
 	expirationTime := time.Now().Add(5 * time.Minute)
-
 	claims := &Claims{
 		Username: creds.Email,
 		StandardClaims: jwt.StandardClaims{
@@ -67,8 +69,8 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
 	tokenString, err := token.SignedString(jwtKey)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -83,6 +85,7 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 
 func Welcome(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("token")
+
 	if err != nil {
 		if err == http.ErrNoCookie {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -93,12 +96,12 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tknStr := c.Value
-
 	claims := &Claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
+
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -107,6 +110,7 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	if !tkn.Valid {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -117,6 +121,7 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 
 func Refresh(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("token")
+
 	if err != nil {
 		if err == http.ErrNoCookie {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -125,15 +130,19 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	tknStr := c.Value
 	claims := &Claims{}
+
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
+
 	if !tkn.Valid {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -152,6 +161,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	claims.ExpiresAt = expirationTime.Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
