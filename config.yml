@@ -5,3 +5,6 @@ database:
   dbname: "MalbayX"
   user: "chamod"
   password: "afmongodb"
+
+secret:
+  key: "FlutterTheCAT"

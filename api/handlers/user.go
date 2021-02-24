@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Shehanka/malbay-x-go-api/config"
 	"github.com/Shehanka/malbay-x-go-api/db"
 	"github.com/Shehanka/malbay-x-go-api/models"
 	"github.com/dgrijalva/jwt-go"
@@ -13,7 +14,7 @@ import (
 )
 
 var userCollection = db.GetUserCollection()
-var jwtKey = []byte("my_secret_key")
+var jwtKey = []byte(config.GetEnv("secret.key"))
 
 func Signup(w http.ResponseWriter, r *http.Request) {
 	var creds models.UserDetail
