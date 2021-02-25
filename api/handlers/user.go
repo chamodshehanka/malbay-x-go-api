@@ -8,6 +8,7 @@ import (
 	"github.com/Shehanka/malbay-x-go-api/internal/auth"
 	"github.com/Shehanka/malbay-x-go-api/models"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-chi/chi"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -130,4 +131,40 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		Value:   tokenString,
 		Expires: expirationTime,
 	})
+}
+
+func ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var creds, userCreds models.Credentials
+
+	_ = json.NewDecoder(r.Body).Decode(&creds)
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	f := bson.D{{"email", creds.Email}}
+
+	if err := userCollection.FindOne(ctx, f).Decode(&userCreds); err != nil {
+		RespondWithError(w, http.StatusUnauthorized, err.Error())
+
+		return
+	}
+
+	ResponseWithJSON(w, http.StatusOK, "http://localhost:4000/api/v1/user/resetpassword/"+userCreds.Password)
+}
+
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	var userCreds models.Credentials
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	f := bson.D{{"password", id}}
+
+	if err := userCollection.FindOne(ctx, f).Decode(&userCreds); err != nil {
+		RespondWithError(w, http.StatusUnauthorized, err.Error())
+
+		return
+	}
+
+	ResponseWithJSON(w, http.StatusOK, "Password : "+userCreds.Password)
 }
