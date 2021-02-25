@@ -9,6 +9,7 @@ import (
 	"github.com/Shehanka/malbay-x-go-api/models"
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -23,7 +24,15 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	result, _ := userCollection.InsertOne(ctx, creds)
+	passwordString, _ := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.MinCost)
+	newCreds := models.UserDetail{
+		Password: string(passwordString),
+		Email:    creds.Email,
+		Name:     creds.Name,
+		Address:  creds.Address,
+	}
+
+	result, _ := userCollection.InsertOne(ctx, newCreds)
 
 	ResponseWithJSON(w, http.StatusOK, result)
 }
@@ -43,11 +52,18 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//fmt.Println("Password :: ", userCreds.Password)
+	err := bcrypt.CompareHashAndPassword([]byte(userCreds.Password), []byte(creds.Password))
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	if err != nil {
+		RespondWithError(w, http.StatusUnauthorized, err.Error())
+
+		return
+	}
+
+	expirationTime := time.Now().Add(5 * time.Hour)
 	claims := &models.Claims{
-		Username: creds.Email,
+		Email:    creds.Email,
+		Password: userCreds.Password,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -82,44 +98,15 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 }
 
 func Refresh(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("token")
-
-	if err != nil {
-		if err == http.ErrNoCookie {
-			RespondWithError(w, http.StatusUnauthorized, err.Error())
-
-			return
-		}
-
-		RespondWithError(w, http.StatusBadRequest, err.Error())
-
-		return
-	}
-
-	tknStr := c.Value
 	claims := &models.Claims{}
+	v, httpStatus, err := auth.TokenValidation(r)
 
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-
-	if !tkn.Valid {
-		RespondWithError(w, http.StatusUnauthorized, "Token is invalid")
+	if !v {
+		RespondWithError(w, httpStatus, err.Error())
 
 		return
 	}
 
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			RespondWithError(w, http.StatusUnauthorized, err.Error())
-
-			return
-		}
-
-		RespondWithError(w, http.StatusBadRequest, err.Error())
-
-		return
-	}
 	//TODO: Increase the time more than 30s
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
 		RespondWithError(w, http.StatusBadRequest, "Token is not expired yet")
@@ -127,7 +114,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(5 * time.Hour)
 	claims.ExpiresAt = expirationTime.Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
