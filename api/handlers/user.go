@@ -74,6 +74,8 @@ func Welcome(w http.ResponseWriter, r *http.Request) {
 
 	if !v {
 		RespondWithError(w, httpStatus, err.Error())
+
+		return
 	}
 
 	ResponseWithJSON(w, http.StatusOK, "Welcome to malbay-x")
