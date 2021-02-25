@@ -16,6 +16,7 @@ var productCollection = db.GetProductCollection()
 
 func ProductCreate(w http.ResponseWriter, r *http.Request) {
 	var product models.Product
+
 	_ = json.NewDecoder(r.Body).Decode(&product)
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
