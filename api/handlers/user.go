@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/Shehanka/malbay-x-go-api/config"
 	"github.com/Shehanka/malbay-x-go-api/db"
+	"github.com/Shehanka/malbay-x-go-api/internal/auth"
 	"github.com/Shehanka/malbay-x-go-api/models"
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
@@ -43,7 +43,7 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Password :: ", userCreds.Password)
+	//fmt.Println("Password :: ", userCreds.Password)
 
 	expirationTime := time.Now().Add(5 * time.Minute)
 	claims := &models.Claims{
@@ -70,43 +70,10 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 }
 
 func Welcome(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("token")
+	v, httpStatus, err := auth.TokenValidation(r)
 
-	if err != nil {
-		if err == http.ErrNoCookie {
-			RespondWithError(w, http.StatusUnauthorized, err.Error())
-
-			return
-		}
-
-		RespondWithError(w, http.StatusBadRequest, err.Error())
-
-		return
-	}
-
-	tknStr := c.Value
-	claims := &models.Claims{}
-
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			RespondWithError(w, http.StatusUnauthorized, err.Error())
-
-			return
-		}
-
-		RespondWithError(w, http.StatusBadRequest, err.Error())
-
-		return
-	}
-
-	if !tkn.Valid {
-		RespondWithError(w, http.StatusUnauthorized, "Token is invalid")
-
-		return
+	if !v {
+		RespondWithError(w, httpStatus, err.Error())
 	}
 
 	ResponseWithJSON(w, http.StatusOK, "Welcome to malbay-x")
