@@ -6,6 +6,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
+
+	cowsay "github.com/Code-Hex/Neo-cowsay"
 )
 
 func main() {
@@ -20,7 +22,13 @@ func main() {
 
 	port := config.GetEnv("server.port")
 
-	logrus.Info("Malbay server listening on ", port)
+	say, _ := cowsay.Say(
+		cowsay.Phrase("Malbay server listening on "+port),
+		cowsay.Type("default"),
+		cowsay.BallonWidth(40),
+	)
+
+	logrus.Print("\n" + say)
 
 	log.Println(http.ListenAndServe(":"+port, routes))
 
