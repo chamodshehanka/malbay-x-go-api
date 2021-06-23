@@ -15,17 +15,12 @@ import (
 func TokenValidation(r *http.Request) (bool, int, error) {
 	userCollection := db.GetUserCollection()
 	jwtKey := []byte(config.GetEnv("secret.key"))
-	c, err := r.Cookie("token")
+	tknStr := r.Header.Get("Authorization")
 
-	if err != nil {
-		if err == http.ErrNoCookie {
-			return false, http.StatusUnauthorized, err
-		}
-
-		return false, http.StatusBadRequest, err
+	if len(tknStr) == 0 {
+		return false, http.StatusBadRequest, errors.New("token not found")
 	}
 
-	tknStr := c.Value
 	claims := &models.Claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {

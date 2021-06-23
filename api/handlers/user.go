@@ -79,11 +79,7 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
+	ResponseWithJSON(w, http.StatusOK, tokenString)
 }
 
 func Welcome(w http.ResponseWriter, r *http.Request) {
